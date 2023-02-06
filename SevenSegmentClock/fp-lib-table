@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/Library.pretty")(options "")(descr ""))
+  (lib (name "ESP8266")(type "KiCad")(uri "${KIPRJMOD}/kicad-ESP8266/ESP8266.pretty")(options "")(descr ""))
+  (lib (name "kicad-ESP8266")(type "KiCad")(uri "${KIPRJMOD}/kicad-ESP8266")(options "")(descr ""))
+)
