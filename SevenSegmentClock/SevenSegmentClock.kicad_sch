@@ -395,7 +395,7 @@
       (reference "U1") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/6db24270-b5f9-4eb2-84c0-aff118e6437f"
-      (reference "U2") (unit 1) (value "74LS138") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
+      (reference "U2") (unit 1) (value "74HC138") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/46a10ea9-ac3f-47f4-9529-71c4b46871f9"
       (reference "U3") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
@@ -422,7 +422,7 @@
       (reference "U10") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/af180f61-76ef-4526-b007-68f9ea324cae/c42a8e86-f9ea-4458-a621-d2a417d95883"
-      (reference "U11") (unit 1) (value "ESP8266") (footprint "ESP8266:ESP12F-Devkit-V3")
+      (reference "U11") (unit 1) (value "ESP8266") (footprint "ESP8266:NodeMCU1.0(12-E)")
     )
   )
 )

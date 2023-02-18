@@ -159,7 +159,7 @@
     (property "Value" "ESP8266" (id 1) (at 209.4104 76.9421 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "ESP8266:ESP12F-Devkit-V3" (id 2) (at 150.749 77.47 0)
+    (property "Footprint" "ESP8266:NodeMCU1.0(12-E)" (id 2) (at 150.749 77.47 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "" (id 3) (at 150.749 77.47 0)
