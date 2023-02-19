@@ -2,12 +2,14 @@
 #include <WiFiUdp.h>
 
 #include <Adafruit_Sensor.h>
-#include <DHT.h>
+// #include <DHT.h>
 
 #include "./types.h"
 #include "./ntp.h"
 #include "./clock.h"
 #include "./display.h"
+
+#include "./dht.h"
 
 #ifndef STASSID
 #include "./env.h"
@@ -22,18 +24,11 @@ const unsigned int udpListenPort = 2390;
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udpClient = WiFiUDP();
 
+Dht dht = Dht();
 Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 
 uint8 lastSecond;
-
-DHT dht(0, DHT11); // Using GPIO 0 = D3
-
-// current temperature & humidity, updated in loop()
-float t = 0.0;
-float h = 0.0;
-
-#define NOP()     __asm__ __volatile__("nop")
 
 void setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
@@ -50,8 +45,8 @@ void setup() {
   // Setting all selection bits to HIGH, the dafault state.
   GPOS = DIGITS_OUTPUT_MASK;
 
-  dht.begin();
-
+  dht.setup();
+  
   Serial.begin(115200);
 
 #if DEBUG_MODE
@@ -91,6 +86,7 @@ void loop() {
     }
   }
 
+  dht.tick(millis());
   clockData.tick();
 
 #if DEBUG_MODE
@@ -128,19 +124,18 @@ void loop() {
     sprintf(buffer, "%02d", clockData.seconds);
     Serial.println(buffer);
 
-    t = dht.readTemperature();
-    h = dht.readHumidity();
-
-    Serial.print(t);
-    Serial.print("ºC - ");
-    Serial.print(h);
-    Serial.println('%');
+    Serial.print(dht.temperatureHigh);
+    Serial.print('.');
+    Serial.print(dht.temperatureLow);
+    Serial.print("º - ");
+    Serial.print(dht.humidityHigh);
+    Serial.print('.');
+    Serial.print(dht.humidityLow);
+    Serial.print('%');
   }
 #endif
 
   outputDigit(clockData.seconds  % 10, DIGIT_SECONDS_0);
-
-
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {
