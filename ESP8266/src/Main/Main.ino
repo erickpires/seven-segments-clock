@@ -1,5 +1,7 @@
+#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+
 
 #include <Adafruit_Sensor.h>
 #include <sigma_delta.h>
@@ -24,12 +26,15 @@ const unsigned int udpListenPort = 2390;
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udpClient = WiFiUDP();
 
+ESP8266WebServer server(8080);
+
 Dht dht = Dht();
 Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 
 uint8 lastSecond;
-uint8 duty = 0;
+uint8 displayDutyCicle = 127;
+int32 timezoneOffsetInHours;
 
 void setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
@@ -77,6 +82,9 @@ void setup() {
   Serial.println("\n\nStarted UDP client at port:");
   Serial.println(udpClient.localPort());
 #endif
+
+  setupConfigurationServer();
+  server.begin();
 }
 
 void loop() {
@@ -138,17 +146,54 @@ void loop() {
     Serial.print('%');
 #endif
 
-    duty += 10;
-    sigmaDeltaWrite(0, duty);
+    sigmaDeltaWrite(0, displayDutyCicle);
   }
 
 
   outputDigit(clockData.seconds  % 10, DIGIT_SECONDS_0);
+
+  server.handleClient();
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {
-  const int32 timezoneDisplacementInSeconds = -(3 * 60 * 60);
-  uint32 localTime = unixEpoch + timezoneDisplacementInSeconds;
+  const int32 timezoneOffsetInSeconds = (timezoneOffsetInHours * 60 * 60);
+  uint32 localTime = unixEpoch + timezoneOffsetInSeconds;
 
   clock.syncronizeFromUnixEpoch(localTime);
+}
+
+void setupConfigurationServer() {
+  server.on("/", []() {
+    String content = "<!DOCTYPE HTML>\n<html><h1>7-segments clock configuration:</h1>";
+    content += "<form method='get' action='settings'><label>Timezone hour offset: </label><input name='tz-offset' type='number' min='-12' max='12'><br/>";
+    content += "<label>Display intensity: </label><input name='intensity' type='range' min='10' max='255'><br/>";
+    content += "<input type='submit' value='Save settings'/></form>";
+    content += "</html>";
+    server.send(200, "text/html", content);  
+  });
+  server.on("/settings", []() {
+    auto tzOffsetStr = server.arg("tz-offset");
+    auto intensityStr = server.arg("intensity");
+
+    auto tzOffset = tzOffsetStr.toInt();
+    auto intensity = intensityStr.toInt();
+
+    Serial.print("Offset: ");
+    Serial.println(tzOffset);
+
+    Serial.print("Intensity: ");
+    Serial.println(intensity);
+
+    if(intensity > 0 && intensity <= 255) {
+      displayDutyCicle = (uint8) intensity;
+    }
+
+    if(tzOffset >= -12 && tzOffset <= 12) {
+      timezoneOffsetInHours = tzOffset;
+      clockData.isSyncronized = false;
+    } 
+
+    String content = "<!DOCTYPE HTML>\n<html><h1>Saved!</h1></html>";
+    server.send(200, "text/html", content);
+  });
 }
