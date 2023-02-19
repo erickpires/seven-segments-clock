@@ -2,7 +2,7 @@
 #include <WiFiUdp.h>
 
 #include <Adafruit_Sensor.h>
-// #include <DHT.h>
+#include <sigma_delta.h>
 
 #include "./types.h"
 #include "./ntp.h"
@@ -29,6 +29,7 @@ Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 
 uint8 lastSecond;
+uint8 duty = 0;
 
 void setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
@@ -46,7 +47,10 @@ void setup() {
   GPOS = DIGITS_OUTPUT_MASK;
 
   dht.setup();
-  
+
+  sigmaDeltaSetup(0, 1220);
+  sigmaDeltaAttachPin(D3);
+
   Serial.begin(115200);
 
 #if DEBUG_MODE
@@ -89,8 +93,8 @@ void loop() {
   dht.tick(millis());
   clockData.tick();
 
-#if DEBUG_MODE
   if(clockData.seconds != lastSecond) {
+#if DEBUG_MODE
     lastSecond = clockData.seconds;
 
     char buffer[5];
@@ -132,8 +136,12 @@ void loop() {
     Serial.print('.');
     Serial.print(dht.humidityLow);
     Serial.print('%');
-  }
 #endif
+
+    duty += 10;
+    sigmaDeltaWrite(0, duty);
+  }
+
 
   outputDigit(clockData.seconds  % 10, DIGIT_SECONDS_0);
 }

@@ -23,30 +23,7 @@ void outputDigit(uint8 digit, DigitSelection selection) {
 
   GPOC = clearMask;
 
-  // NOTE: The minimum setup time for the CD4511 is 150ns.
-  // Considering a clock of 80MHz, each instruction takes:1000000000ns/80000000Hz = 12.5ns.
-  // Therefore, we need at least 150/12.5 = 12 NOPs. During experimentation, 20 NOPs were 
-  // necessary to make the output stable.
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
-  NOP();
+  delayMicroseconds(1);
 
   GPOS = DIGITS_OUTPUT_MASK;
 }
