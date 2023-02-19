@@ -31,4 +31,6 @@ const uint32 DigitsClearMask[] = {
   (~0b00101100) & DIGITS_OUTPUT_MASK,
 };
 
+void outputDigit(uint8 digit, DigitSelection selection);
+
 #endif

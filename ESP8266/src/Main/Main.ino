@@ -149,29 +149,3 @@ void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {
 
   clock.syncronizeFromUnixEpoch(localTime);
 }
-
-void outputDigit(uint8 digit, DigitSelection selection) {
-  // NOTE: Using direct port access to avoid writing the digit bit by bit.
-  // Implementation of digitalWrite: https://github.com/esp8266/Arduino/blob/master/cores/esp8266/core_esp8266_wiring_digital.cpp
-  uint8 setBits = digit & 0b00001111;
-  uint8 clearBits = (~digit) & 0b00001111;
-
-  GPOS = (setBits << 12);
-  GPOC = (clearBits << 12);
-
-  // NOTE: The selection lines are always held HIGH (all ones).
-  // To select a different digit, all we need to do is clear the
-  // bits that must be LOW, wait the propagation delay using NOPs and
-  // change the bit to HIGH again.
-
-  uint32 clearMask = DigitsClearMask[selection];
-
-  Serial.println(clearMask, BIN);
-
-  GPOC = clearMask;
-
-  delay(1);
-  // NOP();  
-
-  GPOS = DIGITS_OUTPUT_MASK;
-}
