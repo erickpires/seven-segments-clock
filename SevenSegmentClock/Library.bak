@@ -704,7 +704,7 @@
         (name "IN-" (effects (font (size 1.27 1.27))))
         (number "1" (effects (font (size 1.27 1.27))))
       )
-      (pin passive line (at 9.144 -3.302 180) (length 2.54)
+      (pin power_out line (at 9.144 -3.302 180) (length 2.54)
         (name "OUT-" (effects (font (size 1.27 1.27))))
         (number "2" (effects (font (size 1.27 1.27))))
       )
