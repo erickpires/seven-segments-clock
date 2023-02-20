@@ -1206,7 +1206,7 @@
     (property "Value" "ESP8266" (id 1) (at 151.6254 72.8781 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "ESP8266:NodeMCU1.0(12-E)" (id 2) (at 92.964 73.406 0)
+    (property "Footprint" "Library:ESP8266 (NodeMCU_12-E)" (id 2) (at 92.964 73.406 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "" (id 3) (at 92.964 73.406 0)

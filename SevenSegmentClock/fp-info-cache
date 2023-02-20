@@ -1,4 +1,4 @@
-20925314842626390
+20926991771976638
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -58681,12 +58681,19 @@ Yellow 5381 Series LED
 2
 2
 Library
+ESP8266 (NodeMCU_12-E)
+
+
+0
+30
+30
+Library
 LM2596
 
 
 0
-0
-0
+4
+4
 Library
 LSD230A
 

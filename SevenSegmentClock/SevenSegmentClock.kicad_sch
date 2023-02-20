@@ -587,28 +587,28 @@
       (reference "SSD8") (unit 1) (value "Percent") (footprint "Display_7Segment:7SegmentLED_LTS6760_LTS6780")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/19686680-f32d-4b64-8a4c-647d2cc524b2"
-      (reference "U1") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U1") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/59b47a62-4838-4b8d-9dec-bacfb9cfbad2"
-      (reference "U2") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U2") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/8b274a77-e8b8-4d2c-bd1a-67c576c1ee4c"
-      (reference "U3") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U3") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/7f799b28-c5ce-4146-8a19-4964d55b2265"
       (reference "U4") (unit 1) (value "4042") (footprint "Package_DIP:DIP-16_W7.62mm_Socket_LongPads")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/69f9eec1-f705-44e6-992c-a55461f74c3d"
-      (reference "U5") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U5") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/ede9ec48-077f-46ec-9223-b5c4e7335042"
-      (reference "U6") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U6") (unit 1) (value "4504") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/6db24270-b5f9-4eb2-84c0-aff118e6437f"
       (reference "U7") (unit 1) (value "74HC138") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/66737a46-b3fd-4abd-ad83-ce9350be322d"
-      (reference "U8") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U8") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/e7e2b373-abfe-4a60-80a4-8982ba8293d1"
       (reference "U9") (unit 1) (value "4082") (footprint "Package_DIP:DIP-14_W7.62mm_Socket_LongPads")
@@ -620,13 +620,13 @@
       (reference "U10") (unit 1) (value "4042") (footprint "Package_DIP:DIP-16_W7.62mm_Socket_LongPads")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/dc767823-6770-43d9-a443-1a0c670a9c93"
-      (reference "U11") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U11") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/080ade9b-5b49-48d1-8801-1844c5bd1d80/fc56d0b2-a009-4d75-95be-ea0b3e6b92c9"
-      (reference "U12") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16W_5.3x10.2mm_P1.27mm")
+      (reference "U12") (unit 1) (value "4511") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/af180f61-76ef-4526-b007-68f9ea324cae/c42a8e86-f9ea-4458-a621-d2a417d95883"
-      (reference "U13") (unit 1) (value "ESP8266") (footprint "ESP8266:NodeMCU1.0(12-E)")
+      (reference "U13") (unit 1) (value "ESP8266") (footprint "Library:ESP8266 (NodeMCU_12-E)")
     )
     (path "/af180f61-76ef-4526-b007-68f9ea324cae/02808ff6-60db-4c05-b29c-2c601665eb91"
       (reference "U14") (unit 1) (value "DHT11") (footprint "Sensor:Aosong_DHT11_5.5x12.0_P2.54mm")
