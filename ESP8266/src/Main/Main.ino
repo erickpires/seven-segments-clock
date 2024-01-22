@@ -3,8 +3,8 @@
 #include <WiFiUdp.h>
 
 
-#include <Adafruit_Sensor.h>
-#include <sigma_delta.h>
+// #include <Adafruit_Sensor.h>
+// #include <sigma_delta.h>
 
 #include "./types.h"
 #include "./ntp.h"
@@ -34,27 +34,33 @@ NtpUpdater updater = NtpUpdater(udpClient);
 
 uint8 lastSecond;
 uint8 displayDutyCicle = 127;
-int32 timezoneOffsetInHours;
+int32 timezoneOffsetInHours = -3;
 
 void setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
-  pinMode(14, OUTPUT);
-  pinMode(15, OUTPUT);
+  pinMode(12, OUTPUT);  // D6
+  pinMode(13, OUTPUT);  // D7
+  pinMode(14, OUTPUT);  // D5
+  pinMode(15, OUTPUT);  // D8
 
   // Setting GPIO 2, 4 and 5 as OUTPUT for the selection digit lines.
   pinMode(2, OUTPUT); // D4
   pinMode(4, OUTPUT); // D2
   pinMode(5, OUTPUT); // D1
 
-  // Setting all selection bits to HIGH, the dafault state.
+  // Dots and percent brightness
+  pinMode(D3, OUTPUT);
+  digitalWrite(D3, HIGH);
+
+  outputDigit(0x00, DIGIT_DOTS);
+
+  // Setting all selection bits to HIGH, the default state.
   GPOS = DIGITS_OUTPUT_MASK;
 
   dht.setup();
 
-  sigmaDeltaSetup(0, 1220);
-  sigmaDeltaAttachPin(D3);
+  // sigmaDeltaSetup(0, 1220);
+  // sigmaDeltaAttachPin(D3);
 
   Serial.begin(115200);
 
@@ -146,11 +152,24 @@ void loop() {
     Serial.print('%');
 #endif
 
-    sigmaDeltaWrite(0, displayDutyCicle);
+    // sigmaDeltaWrite(0, displayDutyCicle);
   }
 
 
   outputDigit(clockData.seconds  % 10, DIGIT_SECONDS_0);
+  outputDigit(clockData.seconds  / 10, DIGIT_SECONDS_1);
+
+  outputDigit(clockData.minutes  % 10, DIGIT_MINUTES_0);
+  outputDigit(clockData.minutes  / 10, DIGIT_MINUTES_1);
+
+  outputDigit(clockData.hours  % 10, DIGIT_HOURS_0);
+  outputDigit(clockData.hours  / 10, DIGIT_HOURS_1);
+
+  // if (clockData.seconds % 2 == 0) {
+  //   outputDigit(0x00, DIGIT_DOTS);
+  // } else {
+  //   outputDigit(0x0F, DIGIT_DOTS);
+  // }
 
   server.handleClient();
 }

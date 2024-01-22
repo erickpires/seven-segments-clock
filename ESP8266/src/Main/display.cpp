@@ -19,6 +19,7 @@ void outputDigit(uint8 digit, DigitSelection selection) {
   // bits that must be LOW, wait the propagation delay using NOPs and
   // change the bit to HIGH again.
 
+  delayMicroseconds(1);
   uint32 clearMask = DigitsClearMask[selection];
 
   GPOC = clearMask;
