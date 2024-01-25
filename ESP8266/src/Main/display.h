@@ -1,23 +1,12 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H 1
 
-enum DigitSelection {
-  DIGIT_SECONDS_0 = 0,
-  DIGIT_SECONDS_1 = 1,
-
-  DIGIT_MINUTES_0 = 2,
-  DIGIT_MINUTES_1 = 3,
-
-  DIGIT_HOURS_0   = 4,
-  DIGIT_HOURS_1   = 5,
-
-  DIGIT_DOTS      = 6,
-
-  NO_DIGITS       = 7
-};
+#define DISPLAY_BLANK 0x0F
+#define DISPLAY_DEGREES 0x0E
+#define DISPLAY_PERCENT 0x0F
 
 #define DIGITS_OUTPUT_MASK 0b00110100
-
+#define DOTS_SELECTION_INDEX 6
 // NOTE: Represents how to output a given selection by clearing some bits.
 // Assumes all the relevant bits are already HIGH.
 const uint32 DigitsClearMask[] = {
@@ -31,6 +20,25 @@ const uint32 DigitsClearMask[] = {
   (~0b00110100) & DIGITS_OUTPUT_MASK,
 };
 
-void outputDigit(uint8 digit, DigitSelection selection);
+enum DotsState {
+  DOUBLE_COLUMNS = 0x0F,
+  DOUBLE_PERIODS = 0x03,
+  SINGLE_PERIOD  = 0x01
+};
+
+class Display {
+  uint8 digits[6];
+  DotsState dotsState;
+  bool isBlinking;
+
+  bool isDirty;
+
+  void outputDigit(uint8 digit, uint selection);
+
+  public:
+  void tick(uint32 millis);
+  void setDigits(uint8 d[6]);
+  void setDotsState(DotsState state, bool blinking);
+};
 
 #endif

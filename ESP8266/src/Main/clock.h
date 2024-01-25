@@ -30,7 +30,7 @@ class Clock {
   bool isSyncronized;
 
   void syncronizeFromUnixEpoch(uint32 unixEpoch);
-  void tick();
+  void tick(unsigned long currentMillis);
 
   Clock() {
     isSyncronized = false;

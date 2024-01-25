@@ -24,9 +24,8 @@ void Clock::syncronizeFromUnixEpoch(uint32 unixEpoch) {
   this->isSyncronized = true;
 }
 
-void Clock::tick() {
+void Clock::tick(unsigned long currentMillis) {
   // TODO: What happens when millis wrap around?
-  auto currentMillis = millis();
   auto diff = currentMillis - this->prevMillis;
 
   this->milliseconds += diff;

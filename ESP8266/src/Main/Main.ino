@@ -17,7 +17,7 @@
 #include "./env.h"
 #endif
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 const char* ssid = STASSID;
 const char* pass = STAPSK;
@@ -31,6 +31,7 @@ ESP8266WebServer server(8080);
 Dht dht = Dht();
 Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
+Display display = Display();
 
 uint8 lastSecond;
 uint8 displayDutyCicle = 127;
@@ -51,8 +52,6 @@ void setup() {
   // Dots and percent brightness
   pinMode(D3, OUTPUT);
   digitalWrite(D3, HIGH);
-
-  outputDigit(0x00, DIGIT_DOTS);
 
   // Setting all selection bits to HIGH, the default state.
   GPOS = DIGITS_OUTPUT_MASK;
@@ -104,8 +103,10 @@ void loop() {
     }
   }
 
-  dht.tick(millis());
-  clockData.tick();
+  auto currentMillis = millis();
+  dht.tick(currentMillis);
+  clockData.tick(currentMillis);
+  display.tick(currentMillis);
 
   if(clockData.seconds != lastSecond) {
 #if DEBUG_MODE
@@ -153,25 +154,86 @@ void loop() {
 #endif
 
     // sigmaDeltaWrite(0, displayDutyCicle);
+    if (clockData.seconds < 5) {
+      displayDate();
+    } else if (clockData.seconds >= 30 && clockData.seconds < 35) {
+      displayTemperature();
+    } else if (clockData.seconds >= 35 && clockData.seconds < 40) {
+      displayHumidity();
+    } else {
+      displayTime();
+    }
   }
 
-
-  outputDigit(clockData.seconds  % 10, DIGIT_SECONDS_0);
-  outputDigit(clockData.seconds  / 10, DIGIT_SECONDS_1);
-
-  outputDigit(clockData.minutes  % 10, DIGIT_MINUTES_0);
-  outputDigit(clockData.minutes  / 10, DIGIT_MINUTES_1);
-
-  outputDigit(clockData.hours  % 10, DIGIT_HOURS_0);
-  outputDigit(clockData.hours  / 10, DIGIT_HOURS_1);
-
-  // if (clockData.seconds % 2 == 0) {
-  //   outputDigit(0x00, DIGIT_DOTS);
-  // } else {
-  //   outputDigit(0x0F, DIGIT_DOTS);
-  // }
-
   server.handleClient();
+}
+
+void displayTime() {
+  uint8 displayDigits[8] = {
+    clockData.seconds  % 10,
+    clockData.seconds  / 10,
+
+    clockData.minutes  % 10,
+    clockData.minutes  / 10,
+
+    clockData.hours  % 10,
+    clockData.hours  / 10
+  };
+
+  display.setDigits(displayDigits);
+  display.setDotsState(DOUBLE_COLUMNS, true);
+}
+
+void displayDate() {
+  uint8 year = clockData.year  % 100;
+  uint8 month = clockData.month + 1;
+  uint8 day = clockData.day + 1;
+
+  uint8 displayDigits[8] = {
+    year  % 10,
+    year  / 10,
+
+    month  % 10,
+    month  / 10,
+
+    day  % 10,
+    day  / 10
+  };
+
+  display.setDigits(displayDigits);
+  display.setDotsState(DOUBLE_PERIODS, false);
+}
+
+void displayTemperature() {
+  uint8 displayDigits[8] = {
+    dht.temperatureLow  % 10,
+    dht.temperatureLow  / 10,
+
+    dht.temperatureHigh  % 10,
+    dht.temperatureHigh  / 10,
+
+    DISPLAY_BLANK,
+    DISPLAY_DEGREES
+  };
+
+  display.setDigits(displayDigits);
+  display.setDotsState(SINGLE_PERIOD, false);
+}
+
+void displayHumidity() {
+  uint8 displayDigits[8] = {
+    dht.humidityLow  % 10,
+    dht.humidityLow  / 10,
+
+    dht.humidityHigh  % 10,
+    dht.humidityHigh  / 10,
+
+    DISPLAY_BLANK,
+    DISPLAY_PERCENT
+  };
+
+  display.setDigits(displayDigits);
+  display.setDotsState(SINGLE_PERIOD, false);
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {

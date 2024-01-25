@@ -1,11 +1,41 @@
+#include "core_esp8266_features.h"
 #include "Arduino.h"
 
 #include "./types.h"
 #include "./display.h"
 
+void Display::setDigits(uint8 d[6]) {
+  for (uint i = 0; i < 6; i++) {
+    this->digits[i] = d[i];
+  }
+
+  this->isDirty = true;
+}
+
+void Display::setDotsState(DotsState state, bool blinking) {
+  this->dotsState = state;
+  this->isBlinking = blinking;
+}
+
+void Display::tick(uint32 millis) {
+  if (this->isDirty) {
+    this->isDirty = false;
+    for(uint i = 0; i < 6; i++) {
+      this->outputDigit(this->digits[i], i);
+    }
+  }
+
+  auto shouldBlankDots = millis & (1 << 9); // == (millis % 1024) < 512
+  if (this->isBlinking && shouldBlankDots) {
+    this->outputDigit(0x00, DOTS_SELECTION_INDEX);
+  } else {
+    this->outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
+  }  
+}
+
 #define NOP()     __asm__ __volatile__("nop")
 
-void outputDigit(uint8 digit, DigitSelection selection) {
+void Display::outputDigit(uint8 digit, uint selection) {
   // NOTE: Using direct port access to avoid writing the digit bit by bit.
   // Implementation of digitalWrite: https://github.com/esp8266/Arduino/blob/master/cores/esp8266/core_esp8266_wiring_digital.cpp
   uint8 setBits = digit & 0b00001111;
