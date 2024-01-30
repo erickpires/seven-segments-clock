@@ -5033,6 +5033,31 @@
     )
   )
 
+  (symbol (lib_id "power:GND") (at 71.374 80.772 180) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 1f247bdb-970e-47ea-9c23-9e7391ea17d9)
+    (property "Reference" "#PWR013" (at 71.374 74.422 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "GND" (at 69.2912 77.0128 0)
+      (effects (font (size 1.27 1.27)) (justify right))
+    )
+    (property "Footprint" "" (at 71.374 80.772 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (at 71.374 80.772 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 5a3d7ba5-8a17-498b-bd1b-2f7c0c06b2e4))
+    (instances
+      (project "SevenSegmentClock"
+        (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
+          (reference "#PWR013") (unit 1)
+        )
+      )
+    )
+  )
+
   (symbol (lib_id "Device:C") (at 14.986 256.413 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1f83582f-9e17-41a6-991c-a57c2ed978b9)
@@ -5260,31 +5285,6 @@
       (project "SevenSegmentClock"
         (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
           (reference "D1") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "power:+3.3V") (at 29.845 175.895 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid 2aff58a4-2e50-4b86-8e68-cfe8211c2cea)
-    (property "Reference" "#PWR029" (at 29.845 179.705 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Value" "+3.3V" (at 29.718 170.1602 90)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Footprint" "" (at 29.845 175.895 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (at 29.845 175.895 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid ced0d48a-b541-4c56-aef5-d09caf2759fa))
-    (instances
-      (project "SevenSegmentClock"
-        (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
-          (reference "#PWR029") (unit 1)
         )
       )
     )
@@ -6874,6 +6874,31 @@
     )
   )
 
+  (symbol (lib_id "power:GND") (at 29.845 175.895 180) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 7f87fa71-fe62-4698-8940-6edc65e6d59a)
+    (property "Reference" "#PWR029" (at 29.845 169.545 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "GND" (at 29.8196 173.1518 90)
+      (effects (font (size 1.27 1.27)) (justify right))
+    )
+    (property "Footprint" "" (at 29.845 175.895 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (at 29.845 175.895 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 5b531ee8-b568-427e-a5ab-f4709f48f2dd))
+    (instances
+      (project "SevenSegmentClock"
+        (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
+          (reference "#PWR029") (unit 1)
+        )
+      )
+    )
+  )
+
   (symbol (lib_id "power:+12V") (at 184.531 164.465 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 82fb2619-307b-4452-a1f5-e581f928a029)
@@ -7192,31 +7217,6 @@
       (project "SevenSegmentClock"
         (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
           (reference "R33") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "power:+3.3V") (at 71.374 80.772 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid 962c8d3b-aad2-4624-bf95-8243a001ff75)
-    (property "Reference" "#PWR013" (at 71.374 84.582 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Value" "+3.3V" (at 67.691 79.4822 0)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Footprint" "" (at 71.374 80.772 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (at 71.374 80.772 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 68816b4d-9287-4ab9-9cf9-991abbe1252b))
-    (instances
-      (project "SevenSegmentClock"
-        (path "/14aa22d5-bc38-4295-9b97-76c65f8b1aaa/080ade9b-5b49-48d1-8801-1844c5bd1d80"
-          (reference "#PWR013") (unit 1)
         )
       )
     )
