@@ -4,6 +4,16 @@
 #include "./types.h"
 #include "./display.h"
 
+#define TRANSITION_DURATION 256
+
+enum TransionDisplayState {
+  DISPLAY_OLD_VALUE = 0,
+  DISPLAY_NEW_VALUE = 1
+};
+
+void outputDigit(uint8 digit, uint selection);
+TransionDisplayState computeDisplayState(uint32 diff);
+
 void Display::setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
   pinMode(12, OUTPUT);  // D6
@@ -28,11 +38,12 @@ void Display::setup() {
 }
 
 void Display::setDigits(uint8 d[6]) {
-  for (uint i = 0; i < 6; i++) {
-    this->digits[i] = d[i];
-  }
+  auto newValue = DisplayValue(d);
 
-  this->isDirty = true;
+  this->oldValue = this->currentValue;
+  this->currentValue = newValue;
+
+  this->hasNewValue = true;
 }
 
 void Display::setDotsState(DotsState state, bool blinking) {
@@ -41,24 +52,83 @@ void Display::setDotsState(DotsState state, bool blinking) {
 }
 
 void Display::tick(uint32 millis) {
-  if (this->isDirty) {
-    this->isDirty = false;
-    for(uint i = 0; i < 6; i++) {
-      this->outputDigit(this->digits[i], i);
+  if (this->hasNewValue) {
+    // NOTE: These three assignments should be atomic to really
+    // avoid race conditions. But, we know that 'isInTransition' is 
+    // always set and clear inside this function, which makes this 
+    // function non-reentrant.
+    // Since 'Display::tick' is always called from the main loop
+    // once per iteration, we shouldn't have two calls racing against
+    // themself. In other words, we should be safe having non-atomic
+    // assignments.
+    this->hasNewValue = false;
+    this->isInTransition = true;
+    this->transitionInitialMillis = millis;
+  }
+
+  // NOTE: Showing 'currentValue' should always be the default state.
+  auto displayState = DISPLAY_NEW_VALUE;
+  if (this->isInTransition) {
+    uint32 millisDiff = millis - this->transitionInitialMillis;
+
+    displayState = computeDisplayState(millisDiff);
+
+    if (millisDiff >= TRANSITION_DURATION) {
+      this->isInTransition = false;
+    }
+  }
+
+  for(uint i = 0; i < 6; i++) {
+    if (displayState == DISPLAY_OLD_VALUE) {
+      outputDigit(this->oldValue.digits[i], i);
+    } else {
+      outputDigit(this->currentValue.digits[i], i);
     }
   }
 
   auto shouldBlankDots = millis & (1 << 9); // == (millis % 1024) < 512
   if (this->isBlinking && shouldBlankDots) {
-    this->outputDigit(0x00, DOTS_SELECTION_INDEX);
+    outputDigit(0x00, DOTS_SELECTION_INDEX);
   } else {
-    this->outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
+    outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
   }  
 }
 
-#define NOP()     __asm__ __volatile__("nop")
+// NOTE: We can conceptualize the transition animation as follows:
+// - We take the transition duration of 256ms and divide it into 16 
+//   chunks of 16ms each.
+// - During the first chunk, we only show the old value.
+// - During the second chunk, we show the new value for 1ms and the
+//   old for 15ms.
+// - All the way to the last chunk, where we show the new value for
+//   15ms and the old value for 1ms.
+// - After that, the transition is considered over and we only show
+//   the new value.
+// - This effectively gives us a transition with 16 discrete states
+//   that are updated every 16ms (approximately 60HZ).
+//
+// This logic gives us a linear transition from the old value
+// to the new. And because we used powers of 2, it can
+// be implemented using only bitwise operations.
+// A sigmoid curve would probably look better than a linear one,
+// but this simple animation already gives a nice visual effect.
+TransionDisplayState computeDisplayState(uint32 diff) {
+  if (diff >= TRANSITION_DURATION) {
+    return DISPLAY_NEW_VALUE;
+  }
 
-void Display::outputDigit(uint8 digit, uint selection) {
+  uint8 lowerNibble = diff & 0x0F;
+  uint8 higherNibble = (diff >> 4) & 0x0F;
+
+  if (lowerNibble >= higherNibble) {
+    return DISPLAY_OLD_VALUE;
+  }
+
+  return DISPLAY_NEW_VALUE;
+}
+
+#define NOP()     __asm__ __volatile__("nop")
+void outputDigit(uint8 digit, uint selection) {
   // NOTE: Using direct port access to avoid writing the digit bit by bit.
   // Implementation of digitalWrite: https://github.com/esp8266/Arduino/blob/master/cores/esp8266/core_esp8266_wiring_digital.cpp
   uint8 setBits = digit & 0b00001111;

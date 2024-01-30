@@ -76,6 +76,8 @@ void loop() {
   display.tick(currentMillis);
 
   if(clockData.seconds != lastSecond) {
+    lastSecond = clockData.seconds;
+    
     if (clockData.seconds < 5) {
       displayDate();
     } else if (clockData.seconds >= 30 && clockData.seconds < 35) {

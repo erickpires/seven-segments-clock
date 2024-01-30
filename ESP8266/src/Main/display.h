@@ -26,14 +26,29 @@ enum DotsState {
   SINGLE_PERIOD  = 0x01
 };
 
-class Display {
+struct DisplayValue {
   uint8 digits[6];
-  DotsState dotsState;
+
+  DisplayValue() {}
+
+  DisplayValue(uint8 d[6]) {
+    for(uint i = 0; i < 6; i++) {
+      this->digits[i] = d[i];
+    }
+  }
+};
+
+class Display {
+  uint32 transitionInitialMillis;
+  
   bool isBlinking;
+  bool isInTransition;
+  bool hasNewValue;
 
-  bool isDirty;
-
-  void outputDigit(uint8 digit, uint selection);
+  DotsState dotsState;
+  
+  DisplayValue oldValue;
+  DisplayValue currentValue;
 
   public:
   void setup();
