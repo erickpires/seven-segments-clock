@@ -36,6 +36,7 @@ class Display {
   void outputDigit(uint8 digit, uint selection);
 
   public:
+  void setup();
   void tick(uint32 millis);
   void setDigits(uint8 d[6]);
   void setDotsState(DotsState state, bool blinking);

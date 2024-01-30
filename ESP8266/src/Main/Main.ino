@@ -17,8 +17,6 @@
 #include "./env.h"
 #endif
 
-#define DEBUG_MODE 0
-
 const char* ssid = STASSID;
 const char* pass = STAPSK;
 const unsigned int udpListenPort = 2390;
@@ -38,35 +36,14 @@ uint8 displayDutyCicle = 127;
 int32 timezoneOffsetInHours = -3;
 
 void setup() {
-  // Setting GPIO 12 through 15 as OUTPUT for the digit values.
-  pinMode(12, OUTPUT);  // D6
-  pinMode(13, OUTPUT);  // D7
-  pinMode(14, OUTPUT);  // D5
-  pinMode(15, OUTPUT);  // D8
-
-  // Setting GPIO 2, 4 and 5 as OUTPUT for the selection digit lines.
-  pinMode(2, OUTPUT); // D4
-  pinMode(4, OUTPUT); // D2
-  pinMode(5, OUTPUT); // D1
-
-  // Dots and percent brightness
-  pinMode(D3, OUTPUT);
-  digitalWrite(D3, HIGH);
-
-  // Setting all selection bits to HIGH, the default state.
-  GPOS = DIGITS_OUTPUT_MASK;
-
-  dht.setup();
-
-  // sigmaDeltaSetup(0, 1220);
-  // sigmaDeltaAttachPin(D3);
-
+  // NOTE: The circuit does not uses the TX/RX pins since they are
+  // used to program the ESP8266. Therefore, there's no problem in
+  // keeping the Serial configured in case we need it for debugging.
   Serial.begin(115200);
 
-#if DEBUG_MODE
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-#endif
+  // NOTE: This method sets the display pins direction and initial state.
+  display.setup();
+  dht.setup();
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -76,17 +53,7 @@ void setup() {
     Serial.print(".");
   }
 
-#if DEBUG_MODE
-  Serial.print("\nConnected with IP address: ");
-  Serial.println(WiFi.localIP());
-#endif
-
   udpClient.begin(udpListenPort);
-
-#if DEBUG_MODE
-  Serial.println("\n\nStarted UDP client at port:");
-  Serial.println(udpClient.localPort());
-#endif
 
   setupConfigurationServer();
   server.begin();
@@ -109,51 +76,6 @@ void loop() {
   display.tick(currentMillis);
 
   if(clockData.seconds != lastSecond) {
-#if DEBUG_MODE
-    lastSecond = clockData.seconds;
-
-    char buffer[5];
-    Serial.print("The local time is ");
-
-    sprintf(buffer, "%02d", clockData.day + 1);
-    Serial.print(buffer);
-
-    Serial.print('/');
-
-    sprintf(buffer, "%02d", clockData.month + 1);
-    Serial.print(buffer);
-
-    Serial.print('/');
-
-    sprintf(buffer, "%04ld", clockData.year);
-    Serial.print(buffer);
-
-    Serial.print(' ');
-
-    sprintf(buffer, "%02d", clockData.hours);
-    Serial.print(buffer);
-
-    Serial.print(':');
-
-    sprintf(buffer, "%02d", clockData.minutes);
-    Serial.print(buffer);
-
-    Serial.print(':');
-
-    sprintf(buffer, "%02d", clockData.seconds);
-    Serial.println(buffer);
-
-    Serial.print(dht.temperatureHigh);
-    Serial.print('.');
-    Serial.print(dht.temperatureLow);
-    Serial.print("º - ");
-    Serial.print(dht.humidityHigh);
-    Serial.print('.');
-    Serial.print(dht.humidityLow);
-    Serial.print('%');
-#endif
-
-    // sigmaDeltaWrite(0, displayDutyCicle);
     if (clockData.seconds < 5) {
       displayDate();
     } else if (clockData.seconds >= 30 && clockData.seconds < 35) {

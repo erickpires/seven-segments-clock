@@ -4,6 +4,29 @@
 #include "./types.h"
 #include "./display.h"
 
+void Display::setup() {
+  // Setting GPIO 12 through 15 as OUTPUT for the digit values.
+  pinMode(12, OUTPUT);  // D6
+  pinMode(13, OUTPUT);  // D7
+  pinMode(14, OUTPUT);  // D5
+  pinMode(15, OUTPUT);  // D8
+
+  // Setting GPIO 2, 4 and 5 as OUTPUT for the selection digit lines.
+  pinMode(2, OUTPUT); // D4
+  pinMode(4, OUTPUT); // D2
+  pinMode(5, OUTPUT); // D1
+
+  // Setting all selection bits to HIGH, the default state.
+  GPOS = DIGITS_OUTPUT_MASK;
+
+  // Display brightness
+  pinMode(D3, OUTPUT);
+  digitalWrite(D3, HIGH);
+
+  // sigmaDeltaSetup(0, 1220);
+  // sigmaDeltaAttachPin(D3);
+}
+
 void Display::setDigits(uint8 d[6]) {
   for (uint i = 0; i < 6; i++) {
     this->digits[i] = d[i];
