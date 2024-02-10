@@ -29,8 +29,6 @@ Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 Display display = Display();
 
-uint8 lastSecond;
-uint8 lastHalfSecond;
 uint8 displayDutyCicle = 127;
 int32 timezoneOffsetInHours = -3;
 
@@ -82,24 +80,19 @@ void loop() {
   display.tick(currentMillis);
 
   auto displayMode = modeToDisplay(clockData.seconds);
-
-  if(clockData.seconds != lastSecond) {
-    lastSecond = clockData.seconds;
-
-    switch (displayMode) {
-      case TIME:
-        displayTime();
-        break;
-      case DATE:
-        displayDate();
-        break;
-      case TEMPERATURE:
-        displayTemperature();
-        break;
-      case HUMIDITY:
-        displayHumidity();
-        break;
-    }
+  switch (displayMode) {
+    case TIME:
+      displayTime();
+      break;
+    case DATE:
+      displayDate();
+      break;
+    case TEMPERATURE:
+      displayTemperature();
+      break;
+    case HUMIDITY:
+      displayHumidity();
+      break;
   }
 
   // NOTE: Instead of dividing the current milliseconds by 500 to
@@ -108,25 +101,21 @@ void loop() {
   //       architectures. The 12 millisecond discrepancy should be
   //       visible anyway.
   uint8 currentHalfSecond = (clockData.milliseconds >> 9) & 1;
-  if (currentHalfSecond != lastHalfSecond) {
-    lastHalfSecond = currentHalfSecond;
-
-    switch (displayMode) {
-      case TIME:
-        if (currentHalfSecond == 0) {
-          display.setDotsState(DOUBLE_COLUMNS);
-        } else {
-          display.setDotsState(BLANK);
-        }
-        break;
-      case DATE:
-        display.setDotsState(DOUBLE_PERIODS);
-        break;
-      case TEMPERATURE:
-      case HUMIDITY:
-        display.setDotsState(SINGLE_PERIOD);
-        break;
-    }
+  switch (displayMode) {
+    case TIME:
+      if (currentHalfSecond == 0) {
+        display.setDotsState(DOUBLE_COLUMNS);
+      } else {
+        display.setDotsState(BLANK);
+      }
+      break;
+    case DATE:
+      display.setDotsState(DOUBLE_PERIODS);
+      break;
+    case TEMPERATURE:
+    case HUMIDITY:
+      display.setDotsState(SINGLE_PERIOD);
+      break;
   }
 
   server.handleClient();
