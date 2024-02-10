@@ -37,6 +37,16 @@ struct DisplayValue {
       this->digits[i] = d[i];
     }
   }
+
+  bool operator==(const DisplayValue& other) {
+    for(uint i = 0; i < 6; i++) {
+      if (this->digits[i] != other.digits[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 };
 
 class Display {
@@ -52,8 +62,8 @@ class Display {
   DotsState oldDotsState;
   DotsState currentDotsState;
   
-  DisplayValue oldValue;
-  DisplayValue currentValue;
+  DisplayValue oldDisplayValue;
+  DisplayValue currentDisplayValue;
 
   public:
   void setup();

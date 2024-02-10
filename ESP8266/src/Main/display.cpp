@@ -40,13 +40,21 @@ void Display::setup() {
 void Display::setDigits(uint8 d[6]) {
   auto newValue = DisplayValue(d);
 
-  this->oldValue = this->currentValue;
-  this->currentValue = newValue;
+  if (newValue == this->currentDisplayValue) {
+    return;
+  }
+
+  this->oldDisplayValue = this->currentDisplayValue;
+  this->currentDisplayValue = newValue;
 
   this->hasNewDisplayValue = true;
 }
 
 void Display::setDotsState(DotsState state) {
+  if (state == this->currentDotsState) {
+    return;
+  }
+  
   this->oldDotsState = this->currentDotsState;
   this->currentDotsState = state;
 
@@ -75,7 +83,7 @@ void Display::tick(uint32 millis) {
     this->dotsTransitionInitialMillis = millis;
   }
 
-  // NOTE: Showing 'currentValue' should always be the default state.
+  // NOTE: Showing 'currentDisplayValue' should always be the default state.
   auto displayTransitionState = DISPLAY_NEW_VALUE;
   if (this->isInDisplayTransition) {
     uint32 millisDiff = millis - this->displayTransitionInitialMillis;
@@ -89,9 +97,9 @@ void Display::tick(uint32 millis) {
 
   for(uint i = 0; i < 6; i++) {
     if (displayTransitionState == DISPLAY_OLD_VALUE) {
-      outputDigit(this->oldValue.digits[i], i);
+      outputDigit(this->oldDisplayValue.digits[i], i);
     } else {
-      outputDigit(this->currentValue.digits[i], i);
+      outputDigit(this->currentDisplayValue.digits[i], i);
     }
   }
 
@@ -145,6 +153,7 @@ TransitionState computeTransitionState(uint32 diff) {
   return DISPLAY_NEW_VALUE;
 }
 
+// TODO: Move the function to a platform especific file.
 #define NOP()     __asm__ __volatile__("nop")
 void outputDigit(uint8 digit, uint selection) {
   // NOTE: Using direct port access to avoid writing the digit bit by bit.
