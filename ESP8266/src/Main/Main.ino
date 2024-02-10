@@ -95,15 +95,9 @@ void loop() {
       break;
   }
 
-  // NOTE: Instead of dividing the current milliseconds by 500 to
-  //       get the halfSecond flag, we are dividing by 512 since it
-  //       can be done with bitwise operations and is faster in some
-  //       architectures. The 12 millisecond discrepancy should be
-  //       visible anyway.
-  uint8 currentHalfSecond = (clockData.milliseconds >> 9) & 1;
   switch (displayMode) {
     case TIME:
-      if (currentHalfSecond == 0) {
+      if (clockData.seconds % 2 == 0) {
         display.setDotsState(DOUBLE_COLUMNS);
       } else {
         display.setDotsState(BLANK);
