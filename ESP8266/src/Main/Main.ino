@@ -114,9 +114,9 @@ void loop() {
     switch (displayMode) {
       case TIME:
         if (currentHalfSecond == 0) {
-          display.setDotsState(BLANK);
-        } else {
           display.setDotsState(DOUBLE_COLUMNS);
+        } else {
+          display.setDotsState(BLANK);
         }
         break;
       case DATE:

@@ -40,12 +40,17 @@ struct DisplayValue {
 };
 
 class Display {
-  uint32 transitionInitialMillis;
+  uint32 displayTransitionInitialMillis;
+  uint32 dotsTransitionInitialMillis;
   
-  bool isInTransition;
-  bool hasNewValue;
+  bool isInDisplayTransition;
+  bool isInDotsTransition;
 
-  DotsState dotsState;
+  bool hasNewDisplayValue;
+  bool hasNewDotsState;
+
+  DotsState oldDotsState;
+  DotsState currentDotsState;
   
   DisplayValue oldValue;
   DisplayValue currentValue;

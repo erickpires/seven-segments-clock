@@ -6,13 +6,13 @@
 
 #define TRANSITION_DURATION 256
 
-enum TransionDisplayState {
+enum TransitionState {
   DISPLAY_OLD_VALUE = 0,
   DISPLAY_NEW_VALUE = 1
 };
 
 void outputDigit(uint8 digit, uint selection);
-TransionDisplayState computeDisplayState(uint32 diff);
+TransitionState computeTransitionState(uint32 diff);
 
 void Display::setup() {
   // Setting GPIO 12 through 15 as OUTPUT for the digit values.
@@ -43,49 +43,73 @@ void Display::setDigits(uint8 d[6]) {
   this->oldValue = this->currentValue;
   this->currentValue = newValue;
 
-  this->hasNewValue = true;
+  this->hasNewDisplayValue = true;
 }
 
 void Display::setDotsState(DotsState state) {
-  this->dotsState = state;
+  this->oldDotsState = this->currentDotsState;
+  this->currentDotsState = state;
+
+  this->hasNewDotsState = true;
 }
 
 void Display::tick(uint32 millis) {
-  if (this->hasNewValue) {
+  if (this->hasNewDisplayValue) {
     // NOTE: These three assignments should be atomic to really
-    // avoid race conditions. But, we know that 'isInTransition' is 
-    // always set and clear inside this function, which makes this 
+    // avoid race conditions. But, we know that 'isInDisplayTransition'
+    // is always set and clear inside this function, which makes this 
     // function non-reentrant.
     // Since 'Display::tick' is always called from the main loop
     // once per iteration, we shouldn't have two calls racing against
     // themself. In other words, we should be safe having non-atomic
     // assignments.
-    this->hasNewValue = false;
-    this->isInTransition = true;
-    this->transitionInitialMillis = millis;
+    this->hasNewDisplayValue = false;
+    this->isInDisplayTransition = true;
+    this->displayTransitionInitialMillis = millis;
+  }
+
+  if (this->hasNewDotsState) {
+    // NOTE: The same concern about the display assigments also apply here.
+    this->hasNewDotsState = false;
+    this->isInDotsTransition = true;
+    this->dotsTransitionInitialMillis = millis;
   }
 
   // NOTE: Showing 'currentValue' should always be the default state.
-  auto displayState = DISPLAY_NEW_VALUE;
-  if (this->isInTransition) {
-    uint32 millisDiff = millis - this->transitionInitialMillis;
+  auto displayTransitionState = DISPLAY_NEW_VALUE;
+  if (this->isInDisplayTransition) {
+    uint32 millisDiff = millis - this->displayTransitionInitialMillis;
 
-    displayState = computeDisplayState(millisDiff);
+    displayTransitionState = computeTransitionState(millisDiff);
 
     if (millisDiff >= TRANSITION_DURATION) {
-      this->isInTransition = false;
+      this->isInDisplayTransition = false;
     }
   }
 
   for(uint i = 0; i < 6; i++) {
-    if (displayState == DISPLAY_OLD_VALUE) {
+    if (displayTransitionState == DISPLAY_OLD_VALUE) {
       outputDigit(this->oldValue.digits[i], i);
     } else {
       outputDigit(this->currentValue.digits[i], i);
     }
   }
 
-  outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
+  auto dotsState = this->currentDotsState;
+  if (this->isInDotsTransition) {
+    uint32 millisDiff = millis - this->dotsTransitionInitialMillis;
+
+    auto dotsTransitionState = computeTransitionState(millisDiff);
+    if (dotsTransitionState == DISPLAY_OLD_VALUE) {
+      dotsState = this->oldDotsState;
+    }
+
+    if (millisDiff >= TRANSITION_DURATION) {
+      this->isInDotsTransition = false;
+    }
+  }
+
+  outputDigit(dotsState, DOTS_SELECTION_INDEX);
 }
 
 // NOTE: We can conceptualize the transition animation as follows:
@@ -106,7 +130,7 @@ void Display::tick(uint32 millis) {
 // be implemented using only bitwise operations.
 // A sigmoid curve would probably look better than a linear one,
 // but this simple animation already gives a nice visual effect.
-TransionDisplayState computeDisplayState(uint32 diff) {
+TransitionState computeTransitionState(uint32 diff) {
   if (diff >= TRANSITION_DURATION) {
     return DISPLAY_NEW_VALUE;
   }
