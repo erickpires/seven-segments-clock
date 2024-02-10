@@ -21,6 +21,7 @@ const uint32 DigitsClearMask[] = {
 };
 
 enum DotsState {
+  BLANK          = 0x00,
   DOUBLE_COLUMNS = 0x0F,
   DOUBLE_PERIODS = 0x03,
   SINGLE_PERIOD  = 0x01
@@ -41,7 +42,6 @@ struct DisplayValue {
 class Display {
   uint32 transitionInitialMillis;
   
-  bool isBlinking;
   bool isInTransition;
   bool hasNewValue;
 
@@ -54,7 +54,7 @@ class Display {
   void setup();
   void tick(uint32 millis);
   void setDigits(uint8 d[6]);
-  void setDotsState(DotsState state, bool blinking);
+  void setDotsState(DotsState state);
 };
 
 #endif

@@ -2,8 +2,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-
-// #include <Adafruit_Sensor.h>
 // #include <sigma_delta.h>
 
 #include "./types.h"
@@ -32,8 +30,16 @@ NtpUpdater updater = NtpUpdater(udpClient);
 Display display = Display();
 
 uint8 lastSecond;
+uint8 lastHalfSecond;
 uint8 displayDutyCicle = 127;
 int32 timezoneOffsetInHours = -3;
+
+enum DisplayMode {
+  TIME,
+  DATE,
+  TEMPERATURE,
+  HUMIDITY
+};
 
 void setup() {
   // NOTE: The circuit does not uses the TX/RX pins since they are
@@ -75,21 +81,67 @@ void loop() {
   clockData.tick(currentMillis);
   display.tick(currentMillis);
 
+  auto displayMode = modeToDisplay(clockData.seconds);
+
   if(clockData.seconds != lastSecond) {
     lastSecond = clockData.seconds;
-    
-    if (clockData.seconds < 5) {
-      displayDate();
-    } else if (clockData.seconds >= 30 && clockData.seconds < 35) {
-      displayTemperature();
-    } else if (clockData.seconds >= 35 && clockData.seconds < 40) {
-      displayHumidity();
-    } else {
-      displayTime();
+
+    switch (displayMode) {
+      case TIME:
+        displayTime();
+        break;
+      case DATE:
+        displayDate();
+        break;
+      case TEMPERATURE:
+        displayTemperature();
+        break;
+      case HUMIDITY:
+        displayHumidity();
+        break;
+    }
+  }
+
+  // NOTE: Instead of dividing the current milliseconds by 500 to
+  //       get the halfSecond flag, we are dividing by 512 since it
+  //       can be done with bitwise operations and is faster in some
+  //       architectures. The 12 millisecond discrepancy should be
+  //       visible anyway.
+  uint8 currentHalfSecond = (clockData.milliseconds >> 9) & 1;
+  if (currentHalfSecond != lastHalfSecond) {
+    lastHalfSecond = currentHalfSecond;
+
+    switch (displayMode) {
+      case TIME:
+        if (currentHalfSecond == 0) {
+          display.setDotsState(BLANK);
+        } else {
+          display.setDotsState(DOUBLE_COLUMNS);
+        }
+        break;
+      case DATE:
+        display.setDotsState(DOUBLE_PERIODS);
+        break;
+      case TEMPERATURE:
+      case HUMIDITY:
+        display.setDotsState(SINGLE_PERIOD);
+        break;
     }
   }
 
   server.handleClient();
+}
+
+DisplayMode modeToDisplay(uint8 currentSeconds) {
+  if (currentSeconds < 5) {
+    return DATE;
+  } else if (currentSeconds >= 30 && currentSeconds < 35) {
+    return TEMPERATURE;
+  } else if (currentSeconds >= 35 && currentSeconds < 40) {
+    return HUMIDITY;
+  }
+
+  return TIME;
 }
 
 void displayTime() {
@@ -105,7 +157,6 @@ void displayTime() {
   };
 
   display.setDigits(displayDigits);
-  display.setDotsState(DOUBLE_COLUMNS, true);
 }
 
 void displayDate() {
@@ -125,7 +176,6 @@ void displayDate() {
   };
 
   display.setDigits(displayDigits);
-  display.setDotsState(DOUBLE_PERIODS, false);
 }
 
 void displayTemperature() {
@@ -141,7 +191,6 @@ void displayTemperature() {
   };
 
   display.setDigits(displayDigits);
-  display.setDotsState(SINGLE_PERIOD, false);
 }
 
 void displayHumidity() {
@@ -157,7 +206,6 @@ void displayHumidity() {
   };
 
   display.setDigits(displayDigits);
-  display.setDotsState(SINGLE_PERIOD, false);
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {

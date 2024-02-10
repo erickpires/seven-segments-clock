@@ -46,9 +46,8 @@ void Display::setDigits(uint8 d[6]) {
   this->hasNewValue = true;
 }
 
-void Display::setDotsState(DotsState state, bool blinking) {
+void Display::setDotsState(DotsState state) {
   this->dotsState = state;
-  this->isBlinking = blinking;
 }
 
 void Display::tick(uint32 millis) {
@@ -86,12 +85,7 @@ void Display::tick(uint32 millis) {
     }
   }
 
-  auto shouldBlankDots = millis & (1 << 9); // == (millis % 1024) < 512
-  if (this->isBlinking && shouldBlankDots) {
-    outputDigit(0x00, DOTS_SELECTION_INDEX);
-  } else {
-    outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
-  }  
+  outputDigit(this->dotsState, DOTS_SELECTION_INDEX);
 }
 
 // NOTE: We can conceptualize the transition animation as follows:
