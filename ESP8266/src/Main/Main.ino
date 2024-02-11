@@ -8,6 +8,7 @@
 #include "./clock.h"
 #include "./display.h"
 #include "./configuration-server.h"
+#include "./configuration-manager.h"
 
 #include "./dht.h"
 
@@ -21,6 +22,7 @@ const unsigned int udpListenPort = 2390;
 
 Configuration configuration;
 ConfigurationServer configServer = ConfigurationServer(configuration, 80);
+ConfigurationManager configManager = ConfigurationManager();
 
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udpClient = WiFiUDP();
@@ -38,7 +40,8 @@ enum DisplayMode {
 };
 
 void setup() {
-  configuration.timezoneHoursOffset = -3;
+  configManager.setup();
+  configuration = configManager.readConfiguration();
 
   // NOTE: The circuit does not uses the TX/RX pins since they are
   // used to program the ESP8266. Therefore, there's no problem in
@@ -115,6 +118,7 @@ void loop() {
 
   if (mustUpdateConfigs) {
     clockData.isSyncronized = false;
+    configManager.writeConfiguration(configuration);
   }
 }
 
