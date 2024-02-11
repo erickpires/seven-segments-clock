@@ -1,4 +1,3 @@
-#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
@@ -8,6 +7,7 @@
 #include "./ntp.h"
 #include "./clock.h"
 #include "./display.h"
+#include "./configuration-server.h"
 
 #include "./dht.h"
 
@@ -19,18 +19,16 @@ const char* ssid = STASSID;
 const char* pass = STAPSK;
 const unsigned int udpListenPort = 2390;
 
+Configuration configuration;
+ConfigurationServer configServer = ConfigurationServer(configuration, 80);
+
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udpClient = WiFiUDP();
-
-ESP8266WebServer server(8080);
 
 Dht dht = Dht();
 Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 Display display = Display();
-
-uint8 displayDutyCicle = 127;
-int32 timezoneOffsetInHours = -3;
 
 enum DisplayMode {
   TIME,
@@ -40,6 +38,8 @@ enum DisplayMode {
 };
 
 void setup() {
+  configuration.timezoneHoursOffset = -3;
+
   // NOTE: The circuit does not uses the TX/RX pins since they are
   // used to program the ESP8266. Therefore, there's no problem in
   // keeping the Serial configured in case we need it for debugging.
@@ -59,8 +59,7 @@ void setup() {
 
   udpClient.begin(udpListenPort);
 
-  setupConfigurationServer();
-  server.begin();
+  configServer.setup();
 }
 
 void loop() {
@@ -112,7 +111,11 @@ void loop() {
       break;
   }
 
-  server.handleClient();
+  auto mustUpdateTime = configServer.handleClient();
+
+  if (mustUpdateTime) {
+    clockData.isSyncronized = false;
+  }
 }
 
 DisplayMode modeToDisplay(uint8 currentSeconds) {
@@ -192,44 +195,8 @@ void displayHumidity() {
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {
-  const int32 timezoneOffsetInSeconds = (timezoneOffsetInHours * 60 * 60);
+  const int32 timezoneOffsetInSeconds = (configuration.timezoneHoursOffset * 60 * 60) + (configuration.timezoneMinutesOffset * 60);
   uint32 localTime = unixEpoch + timezoneOffsetInSeconds;
 
   clock.syncronizeFromUnixEpoch(localTime);
-}
-
-void setupConfigurationServer() {
-  server.on("/", []() {
-    String content = "<!DOCTYPE HTML>\n<html><h1>7-segments clock configuration:</h1>";
-    content += "<form method='get' action='settings'><label>Timezone hour offset: </label><input name='tz-offset' type='number' min='-12' max='12'><br/>";
-    content += "<label>Display intensity: </label><input name='intensity' type='range' min='10' max='255'><br/>";
-    content += "<input type='submit' value='Save settings'/></form>";
-    content += "</html>";
-    server.send(200, "text/html", content);  
-  });
-  server.on("/settings", []() {
-    auto tzOffsetStr = server.arg("tz-offset");
-    auto intensityStr = server.arg("intensity");
-
-    auto tzOffset = tzOffsetStr.toInt();
-    auto intensity = intensityStr.toInt();
-
-    Serial.print("Offset: ");
-    Serial.println(tzOffset);
-
-    Serial.print("Intensity: ");
-    Serial.println(intensity);
-
-    if(intensity > 0 && intensity <= 255) {
-      displayDutyCicle = (uint8) intensity;
-    }
-
-    if(tzOffset >= -12 && tzOffset <= 12) {
-      timezoneOffsetInHours = tzOffset;
-      clockData.isSyncronized = false;
-    } 
-
-    String content = "<!DOCTYPE HTML>\n<html><h1>Saved!</h1></html>";
-    server.send(200, "text/html", content);
-  });
 }
