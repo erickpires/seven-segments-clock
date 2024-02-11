@@ -1,10 +1,14 @@
 #include "core_esp8266_features.h"
+#include <sigma_delta.h>
 #include "Arduino.h"
+
 
 #include "./types.h"
 #include "./display.h"
 
 #define TRANSITION_DURATION 256
+
+#define SIGMA_DELTA_CHANNEL 0
 
 enum TransitionState {
   DISPLAY_OLD_VALUE = 0,
@@ -30,11 +34,8 @@ void Display::setup() {
   GPOS = DIGITS_OUTPUT_MASK;
 
   // Display brightness
-  pinMode(D3, OUTPUT);
-  digitalWrite(D3, HIGH);
-
-  // sigmaDeltaSetup(0, 1220);
-  // sigmaDeltaAttachPin(D3);
+  sigmaDeltaSetup(SIGMA_DELTA_CHANNEL, 1220);
+  sigmaDeltaAttachPin(D3, SIGMA_DELTA_CHANNEL);
 }
 
 void Display::setDigits(uint8 d[6]) {
@@ -59,6 +60,10 @@ void Display::setDotsState(DotsState state) {
   this->currentDotsState = state;
 
   this->hasNewDotsState = true;
+}
+
+void Display::setBrightness(uint8 brightness) {
+  sigmaDeltaWrite(SIGMA_DELTA_CHANNEL, brightness);
 }
 
 void Display::tick(uint32 millis) {

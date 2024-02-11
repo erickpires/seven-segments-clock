@@ -1,8 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-// #include <sigma_delta.h>
-
 #include "./types.h"
 #include "./ntp.h"
 #include "./clock.h"
@@ -40,6 +38,10 @@ enum DisplayMode {
 };
 
 void setup() {
+  // NOTE: This method sets the display pins direction and initial state.
+  display.setup();
+  dht.setup();
+
   configManager.setup();
   configuration = configManager.readConfiguration();
 
@@ -47,10 +49,6 @@ void setup() {
   // used to program the ESP8266. Therefore, there's no problem in
   // keeping the Serial configured in case we need it for debugging.
   Serial.begin(115200);
-
-  // NOTE: This method sets the display pins direction and initial state.
-  display.setup();
-  dht.setup();
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -112,6 +110,12 @@ void loop() {
     case HUMIDITY:
       display.setDotsState(SINGLE_PERIOD);
       break;
+  }
+
+  if (isNightTime() && configuration.decreaseBrightnessDuringNight) {
+    display.setBrightness(configuration.displayBrightness / 2);
+  } else {
+    display.setBrightness(configuration.displayBrightness);
   }
 
   auto mustUpdateConfigs = configServer.handleClient();
@@ -196,6 +200,10 @@ void displayHumidity() {
   };
 
   display.setDigits(displayDigits);
+}
+
+bool isNightTime() {
+  return clockData.hours >= 21 || clockData.hours < 6;
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {

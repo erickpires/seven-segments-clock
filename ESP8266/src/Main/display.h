@@ -68,6 +68,7 @@ class Display {
   public:
   void setup();
   void tick(uint32 millis);
+  void setBrightness(uint8 brightness);
   void setDigits(uint8 d[6]);
   void setDotsState(DotsState state);
 };
