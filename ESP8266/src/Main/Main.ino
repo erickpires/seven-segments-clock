@@ -111,9 +111,9 @@ void loop() {
       break;
   }
 
-  auto mustUpdateTime = configServer.handleClient();
+  auto mustUpdateConfigs = configServer.handleClient();
 
-  if (mustUpdateTime) {
+  if (mustUpdateConfigs) {
     clockData.isSyncronized = false;
   }
 }
@@ -195,7 +195,10 @@ void displayHumidity() {
 }
 
 void synchronizeClockWithUnixEpoch(Clock& clock, uint32 unixEpoch) {
-  const int32 timezoneOffsetInSeconds = (configuration.timezoneHoursOffset * 60 * 60) + (configuration.timezoneMinutesOffset * 60);
+  const int32 timezoneOffsetInSeconds = 
+    (configuration.timezoneHoursOffset * 60 * 60) + 
+    ((configuration.isInDaylightSaving ? 1 : 0) * 60 * 60) + 
+    (configuration.timezoneMinutesOffset * 60);
   uint32 localTime = unixEpoch + timezoneOffsetInSeconds;
 
   clock.syncronizeFromUnixEpoch(localTime);

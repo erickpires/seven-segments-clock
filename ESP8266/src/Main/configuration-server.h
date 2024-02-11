@@ -13,14 +13,26 @@ struct Configuration {
 
   uint8 displayBrightness;
   bool decreaseBrightnessDuringNight;
+
+  bool operator!=(Configuration& other) {
+    return 
+      this->timezoneHoursOffset != other.timezoneHoursOffset ||
+      this->timezoneMinutesOffset != other.timezoneMinutesOffset ||
+      
+      this->isInDaylightSaving != other.isInDaylightSaving ||
+
+      this->displayBrightness != other.displayBrightness ||
+      this->decreaseBrightnessDuringNight != other.decreaseBrightnessDuringNight;
+  }
 };
 
 class ConfigurationServer {
   ESP8266WebServer server;
   Configuration& config;
 
-  bool mustUpdateTime;
+  bool mustUpdateConfigs;
 
+  void updateConfigFromServer();
   public:
   ConfigurationServer(Configuration& c, int port): config(c), server(port) { }
 
