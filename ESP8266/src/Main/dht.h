@@ -3,7 +3,7 @@
 
 #define DHT_INIT_TIME 1000
 #define DHT_START_TRANSFER_INTERVAL 20
-#define DHT_READ_INTERVAL 5000
+#define DHT_READ_INTERVAL 2000
 
 // NOTE: As per the datasheet, a LOW pulse is 28us and a high pulse is 70us.
 // We will use 50us, as it is almost the middle point.
