@@ -9,12 +9,19 @@
 // We will use 50us, as it is almost the middle point.
 #define DHT_HIGH_INTERVAL_THRESHOLD 50
 
-#define DHT_PIN D0
+enum SensorType {
+  DHT11,
+  DHT22
+};
 
 class Dht {
+  SensorType sensorType;
+
   uint32 prevMillis;
   bool isReady;
   bool hasOngoingRead;
+
+  uint8 sensorPin;
 
   uint8 waitForState(uint8 state);
   void readDataBits(uint8 buffer[]);
@@ -28,6 +35,8 @@ class Dht {
   
   void setup();
   void tick(uint32 millis);
+
+  Dht(uint8 p, SensorType t): sensorPin(p), sensorType(t) { }
 };
 
 #endif

@@ -25,7 +25,7 @@ ConfigurationManager configManager = ConfigurationManager();
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udpClient = WiFiUDP();
 
-Dht dht = Dht();
+Dht dht = Dht(D0, DHT22);
 Clock clockData = Clock();
 NtpUpdater updater = NtpUpdater(udpClient);
 Display display = Display();

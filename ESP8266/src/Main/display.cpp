@@ -2,7 +2,6 @@
 #include <sigma_delta.h>
 #include "Arduino.h"
 
-
 #include "./types.h"
 #include "./display.h"
 

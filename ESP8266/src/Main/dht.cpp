@@ -6,7 +6,7 @@
 // Implemented according to: https://d229kd5ey79jzj.cloudfront.net/791/Datasheet_DHT11.pdf
 
 void Dht::setup() {
-  pinMode(DHT_PIN, INPUT);
+  pinMode(this->sensorPin, INPUT);
 }
 
 void Dht::tick(uint32 millis) {
@@ -30,8 +30,8 @@ void Dht::tick(uint32 millis) {
     }
 
     // Pulling the data line LOW for >18ms to initialize the communication
-    pinMode(DHT_PIN, OUTPUT);
-    digitalWrite(DHT_PIN, LOW);
+    pinMode(this->sensorPin, OUTPUT);
+    digitalWrite(this->sensorPin, LOW);
 
     prevMillis = millis;
     hasOngoingRead = true;
@@ -43,7 +43,7 @@ void Dht::tick(uint32 millis) {
   hasOngoingRead = false;
 
   // Letting the input pull-up pull the data line HIGH
-  pinMode(DHT_PIN, INPUT);
+  pinMode(this->sensorPin, INPUT);
 
   delayMicroseconds(50);
 
@@ -132,7 +132,7 @@ void Dht::readDataBits(uint8 buffer[]) {
 
 uint8 Dht::waitForState(uint8 state) {
   uint32 startMicros = micros();
-  while(digitalRead(DHT_PIN) != state) {
+  while(digitalRead(this->sensorPin) != state) {
     if(micros() - startMicros > 255) {
       return 0xFF;
     }
