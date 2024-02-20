@@ -106,10 +106,28 @@ void Dht::tick(uint32 millis) {
     return;
   }
 
-  temperatureHigh = newTemperatureHigh;
-  temperatureLow = newTemperatureLow;
-  humidityHigh = newHumidityHigh;
-  humidityLow = newHumidityLow;
+  switch (this->sensorType) {
+    case DHT11:
+      temperatureHigh = newTemperatureHigh;
+      temperatureLow = newTemperatureLow;
+      humidityHigh = newHumidityHigh;
+      humidityLow = newHumidityLow;
+      break;
+    case DHT22:
+    // NOTE: The DHT22 sensor has different meanings for the high and low parts
+    // of the temperature and humidity values. And this difference is not documented
+    // in the datasheet.
+    // The code bellow was written after reading the Adafruit implementation.
+    // https://github.com/adafruit/DHT-sensor-library/blob/master/DHT.cpp
+      uint16 fullTemperature = (newTemperatureHigh & 0x7f) << 8 | newTemperatureLow;
+      uint16 fullHumidity = (newHumidityHigh & 0x7f) << 8 | newHumidityLow;
+
+      temperatureHigh = fullTemperature / 10;
+      temperatureLow = (fullTemperature % 10) * 10;
+      humidityHigh = fullHumidity / 10;
+      humidityLow = (fullHumidity % 10) * 10;
+      break;
+  }
 }
 
 void Dht::readDataBits(uint8 buffer[]) {
